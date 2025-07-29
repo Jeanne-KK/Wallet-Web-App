@@ -1,0 +1,26 @@
+import { NavLink } from "react-router-dom";
+
+interface Page {
+  name: string;
+  to: string;
+}
+
+const page: Page[] = [
+    {name: "Dashboard", to: "#borad"},
+    {name: "Transactions", to: "#trans"},
+]
+
+
+const Navbar = () => {
+    return (
+        <div className="flex w-auto bg-white p-5 rounded-xl md:rounded-3xl text-md items-center">
+            <div className="text-xl md:text-3xl font-bold text-[#667eea]">My Wallet</div>
+            <div className="flex ml-auto gap-x-1 md:gap-x-10"> 
+                <div className="cursor-pointer rounded-xl hover:bg-indigo-100 py-1 px-1 md:py-2 md:px-5 duration-300">Dashboard</div>
+                <div className="cursor-pointer rounded-xl hover:bg-indigo-100 py-1 px-1 md:py-2 md:px-5 duration-300">Transactions</div>
+            </div>
+        </div>
+    )
+}
+
+export default Navbar
