@@ -9,7 +9,11 @@ const StepOne = () => {
     const [inputBaht, setInputBaht] = useState<string>('');
 
     function handleSelectBank(num: number): void {
+        if(selectMethod === num){
+            return
+        }
         setInputAccNo('');
+        setInputBaht('');
         setSelectMethod(num);
     }
 
@@ -67,9 +71,6 @@ const StepOne = () => {
                 </button>
             </div>
             {renderInputNo(selectMethod)}
-
-
-
         </div>
     )
 }
