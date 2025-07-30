@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar"
 import QuickActions from "../components/QuickActions"
 import RecentTrans from "../components/RecentTrans"
+import ThisMonth from "../components/ThisMonth"
 import TotalBalance from "../components/TotalBalance"
 
 
@@ -13,6 +14,7 @@ const Home = () => {
                 <div><TotalBalance amount={"2,324.50"} /></div>
                 <div className=""><QuickActions /></div>
                 <div className=""><RecentTrans /></div>
+                <div className=""><ThisMonth /></div>
             </div>
 
         </div>
