@@ -9,7 +9,7 @@ const StepOne = () => {
     const [inputBaht, setInputBaht] = useState<string>('');
 
     function handleSelectBank(num: number): void {
-        if(selectMethod === num){
+        if (selectMethod === num) {
             return
         }
         setInputAccNo('');
@@ -57,20 +57,23 @@ const StepOne = () => {
     }
 
     return (
-        <div className="bg-white p-5 rounded-xl">
-            <span className="text-xl font-semibold">To</span>
-            <div className='flex items-center gap-x-5 mt-5'>
-                <button onClick={() => handleSelectBank(1)} className='flex flex-col items-center cursor-pointer'>
-                    <AccountBalanceIcon />
-                    <span className={selectMethod === 1 ? "underline" : ""}>Bank</span>
-                </button>
+        <div className="bg-white p-5 rounded-xl ">
+            <div className='w-full md:w-150 mx-auto'>
+                <span className="text-xl font-semibold">To</span>
+                <div className='flex items-center gap-x-5 mt-5'>
+                    <button onClick={() => handleSelectBank(1)} className='flex flex-col items-center cursor-pointer'>
+                        <AccountBalanceIcon />
+                        <span className={selectMethod === 1 ? "underline" : ""}>Bank</span>
+                    </button>
 
-                <button onClick={() => handleSelectBank(2)} className='flex flex-col items-center cursor-pointer'>
-                    <AccountBalanceWalletIcon />
-                    <span className={selectMethod === 2 ? "underline" : ""}>PrompPay</span>
-                </button>
+                    <button onClick={() => handleSelectBank(2)} className='flex flex-col items-center cursor-pointer'>
+                        <AccountBalanceWalletIcon />
+                        <span className={selectMethod === 2 ? "underline" : ""}>PrompPay</span>
+                    </button>
+                </div>
+                {renderInputNo(selectMethod)}
             </div>
-            {renderInputNo(selectMethod)}
+
         </div>
     )
 }
