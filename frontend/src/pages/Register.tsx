@@ -17,8 +17,6 @@ const Register = () => {
                 <input type="password" className="border-1 border-gray-300 p-2 rounded-lg" placeholder='Enter your password' />
                 <button className="cursor-pointer bg-purple-500 hover:bg-purple-600 rounded-lg p-2 text-white font-semibold duration-300 mt-5">Signup</button>
                 <span className='mt-3 mx-auto'>Already have an account? <Link className='font-semibold' to="/login">Login</Link></span>
-
-                
             </div>
         </div>
     )
