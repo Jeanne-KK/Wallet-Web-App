@@ -5,6 +5,9 @@ services:
       dockerfile: dockerfile
     ports:
       - 5000:5000
+    volumes:
+      - ./backend/internal:/app/internal
+      - ./backend/main.go:/app/main.go
 
 
   db:

@@ -9,24 +9,20 @@ import (
 	"myapp/internal/utils"
 	"myapp/internal/db"	
 	"database/sql"
+	"context"
 )
 
 var validate = validator.New()
-
-type Response struct {
-    Success bool `json:"success"`
-    Message string `json:"message"`
-	Data interface{} `json:data,omitempty`
-}
 
 func Login(w http.ResponseWriter, r *http.Request){
 	//		Check method
 	if r.Method != http.MethodPost{
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Method not allow",
 		})
+		return
 	}
 
 	//		Check format json
@@ -34,17 +30,18 @@ func Login(w http.ResponseWriter, r *http.Request){
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Invalid JSON format",
 		})
+		return
 	}
 
 	//		Validate input
 	err = validate.Struct(data)
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Validation fail: " + err.Error(),
 		})
@@ -57,7 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request){
 	err = db.DB.QueryRow("select u_mail, u_password from user where u_mail = ?", data.Mail).Scan(&user.Mail, &user.Password)
 	if err != nil{
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Invalid email or password",	
 		})	
@@ -68,7 +65,7 @@ func Login(w http.ResponseWriter, r *http.Request){
 	//		Check password
 	if !utils.CheckPassword(data.Password, user.Password){
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Invalid email or password",	
 		})	
@@ -79,20 +76,20 @@ func Login(w http.ResponseWriter, r *http.Request){
 	token, err := utils.GenerateToken(user.Mail)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Fail to create token",	
 		})	
 		return
 	}
+	
+	//		Set cookie
+	utils.SetCookie(w, token)
 
 	//		return token
-	json.NewEncoder(w).Encode(Response{
+	json.NewEncoder(w).Encode(model.Response{
 		Success: true,
-		Message: "Login success",
-		Data: model.AuthResponse{
-			Token: token,
-		},
+		Message: "Login success",	
 	})
 	
 }
@@ -102,7 +99,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	//		Check method
 	if r.Method != http.MethodPost{
 		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Method not allow",
 		})
@@ -113,7 +110,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Invalid JSON format",
 		})
@@ -123,7 +120,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	err = validate.Struct(data)
 	if err != nil{
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Validation fail: " + err.Error(),
 		})
@@ -138,7 +135,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		if err != sql.ErrNoRows {
 			w.WriteHeader(http.StatusConflict)
-			json.NewEncoder(w).Encode(Response{
+			json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Email already exists",	
 		})	
@@ -150,7 +147,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	hash, err := utils.HashPassword(data.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Fail to hash password",	
 		})	
@@ -170,7 +167,7 @@ func Register(w http.ResponseWriter, r *http.Request){
 	_, err = db.DB.Exec("insert into user (u_mail, u_password, u_name, u_surname, u_phone) values (?, ?, ?, ?, ?)", newUser.Mail, newUser.Password, newUser.Name, newUser.Surname, newUser.Phone)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Fail to create user",	
 		})	
@@ -181,19 +178,73 @@ func Register(w http.ResponseWriter, r *http.Request){
 	token, err := utils.GenerateToken(newUser.Mail)
 	if err != nil{
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(Response{
+		json.NewEncoder(w).Encode(model.Response{
 			Success: false,
 			Message: "Fail to create token",	
 		})	
 		return
 	}
 
+	//		Use httpCookie
+	utils.SetCookie(w, token)
+
 	//		return token
-	json.NewEncoder(w).Encode(Response{
+	json.NewEncoder(w).Encode(model.Response{
 		Success: true,
 		Message: "Register success",
-		Data: model.AuthResponse{
-			Token: token,
-		},
+	})
+}
+
+func Logout(w http.ResponseWriter, r *http.Request){
+	//		Check method
+	if r.Method != http.MethodPost{
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Method not allow",
+		})
+		return
+	}
+
+	//		Get mail from context middleware
+	mail := r.Context().Value("mail")
+	if mail == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Dont have token",
+		})
+		return
+	}
+
+	//		Clear cookie
+	utils.ClearCookie(w)
+
+	//		Response
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Logout success",
+	})
+}
+
+func AuthMiddleware(next http.Handler) http.Handler{
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+		log.Println("FROM middleware")
+
+		//		Get cookie
+		cookie, err := utils.GetCookie(r, "jwt")
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode(model.Response{
+				Success: false,
+				Message: "Cookie not found",
+			})
+		return
+		}
+	
+		data, err := utils.ValidateToken(cookie)
+		//log.Println(data.Mail)
+		ctx := context.WithValue(r.Context(), "mail", data.Mail)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

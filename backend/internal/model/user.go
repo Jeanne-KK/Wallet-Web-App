@@ -16,3 +16,10 @@ type InputRegister struct {
 	Surname string `json:"surname" validate:"required,alpha,max=100"`
 	Phone string `json:"phone" validate:"required,numeric,min=9,max=10"`
 }
+
+type User struct {
+	Name string `json:"name"`
+	Surname string `json:"surname"`
+	Mail string `json:"mail"`
+	Phone string `json:"phone"`
+}
