@@ -5,6 +5,7 @@ import (
 	"myapp/internal/model"
 	"net/http"
 	"myapp/internal/db"
+	//"log"
 )
 
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {	
@@ -49,4 +50,57 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request) {
 		Data: user,
 	})	
 	return
+}
+
+func GetUserBalance(w http.ResponseWriter, r *http.Request) {
+	//		Check method
+	if r.Method != http.MethodPost{
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Method not allow",
+		})
+		return
+	}
+
+	//		Get mail from context middleware	
+	mail := r.Context().Value("mail")
+	if mail == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Dont have token",
+		})
+		return
+	}
+
+	//		Get u_id from DB
+	var user model.User	
+	err := model.GetUserByEmail(mail.(string), &user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Dont have Mail in DB",
+		})
+		return
+	}
+
+	//		Get Balance from DB
+	err = model.GetBalance(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(model.Response{
+			Success: false,
+			Message: "Dont have u_id with balance",
+		})
+		return
+	}
+	
+	//		Send Data
+	json.NewEncoder(w).Encode(model.Response{
+		Success: true,
+		Message: "Get Balance",
+		Data: user,
+	})
 }

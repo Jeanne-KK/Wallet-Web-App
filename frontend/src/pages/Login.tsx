@@ -11,6 +11,7 @@ const Login = () => {
     const [mail, setMail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const [checkErr, setCheckErr] = useState<boolean>(false);
 
     const handleLogin = async() =>{
         //      Protect repeat press
@@ -55,9 +56,9 @@ const Login = () => {
                 <div className='w-12 h-12 md:w-15 md:h-15 bg-gray-800 rounded-lg text-4xl md:text-5xl flex justify-center items-center mx-auto text-white'><WalletIcon fontSize='inherit' /></div>
                 <span className="mx-auto text-2xl font-bold">My Wallet</span>
                 <span className='font-semibold mt-3'>Email</span>
-                <input onChange={(e)=>setMail(e.currentTarget.value)} type="text" className="border-1 border-gray-300 p-2 rounded-lg" placeholder='Enter your email' />
+                <input onChange={(e)=>setMail(e.currentTarget.value)} type="text" className="border-1 border-gray-300 p-2 rounded-lg" placeholder='Enter your email' required/>
                 <span className='font-semibold mt-3'>password</span>
-                <input onChange={(e)=>setPassword(e.currentTarget.value)} type="password" className="border-1 border-gray-300 p-2 rounded-lg" placeholder='Enter your password' />
+                <input onChange={(e)=>setPassword(e.currentTarget.value)} type="password" className="border-1 border-gray-300 p-2 rounded-lg" placeholder='Enter your password' required/>
                 <button onClick={handleLogin} className="cursor-pointer bg-purple-500 hover:bg-purple-600 rounded-lg p-2 text-white font-semibold duration-300 mt-5">Login</button>
                 <span className='mt-3 mx-auto'>Don't have an account? <Link className='font-semibold' to="/register">Register</Link></span> 
             </div>

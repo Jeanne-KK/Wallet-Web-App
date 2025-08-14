@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Aug 02, 2025 at 04:40 AM
+-- Generation Time: Aug 08, 2025 at 11:21 AM
 -- Server version: 9.4.0
 -- PHP Version: 8.2.27
 
@@ -20,6 +20,22 @@ SET time_zone = "+00:00";
 --
 -- Database: `mydatabase`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transaction`
+--
+
+CREATE TABLE `transaction` (
+  `t_id` int NOT NULL,
+  `w_id` int NOT NULL,
+  `type` varchar(5) NOT NULL,
+  `amount` decimal(10,0) NOT NULL,
+  `from_w_id` int NOT NULL,
+  `to_w_id` int NOT NULL,
+  `t_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -42,11 +58,31 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`u_id`, `u_name`, `u_surname`, `u_mail`, `u_password`, `u_created_at`, `u_phone`) VALUES
-(1, 'Nanamin', 'Kasasa', 'nana@ksa.com', '$2a$10$GCubwo4iVBiyI6y9idMw8.HtB2AhZy1sxPaHArVzrdku/DoNaA/Qu', '2025-08-01 14:59:20', '0123456789');
+(1, 'Nanamin', 'Kasasa', 'nana@ksa.com', '$2a$10$GCubwo4iVBiyI6y9idMw8.HtB2AhZy1sxPaHArVzrdku/DoNaA/Qu', '2025-08-01 14:59:20', '0123456789'),
+(2, 'Cutto', 'Ripta', 'cut@cut.com', '$2a$10$Q226xQHsTWHsGy/Q/QWPRe77K.T.2wlimFi9.fFkY8NZUfxoDHymi', '2025-08-03 01:35:43', '0123456354');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wallet`
+--
+
+CREATE TABLE `wallet` (
+  `w_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `w_balance` decimal(10,0) NOT NULL,
+  `w_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `transaction`
+--
+ALTER TABLE `transaction`
+  ADD PRIMARY KEY (`t_id`);
 
 --
 -- Indexes for table `user`
@@ -55,14 +91,32 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`u_id`);
 
 --
+-- Indexes for table `wallet`
+--
+ALTER TABLE `wallet`
+  ADD PRIMARY KEY (`w_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `transaction`
+--
+ALTER TABLE `transaction`
+  MODIFY `t_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `u_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `u_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `wallet`
+--
+ALTER TABLE `wallet`
+  MODIFY `w_id` int NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -31,6 +31,7 @@ func main(){
 	mux.HandleFunc("/login", handler.Login)
 	mux.HandleFunc("/register", handler.Register)
 	mux.Handle("/getUserInfo", handler.AuthMiddleware(http.HandlerFunc(handler.GetUserInfo)))
+	mux.Handle("/getUserBalance", handler.AuthMiddleware(http.HandlerFunc(handler.GetUserBalance)))
 	mux.Handle("/logout", handler.AuthMiddleware(http.HandlerFunc(handler.Logout)))
 
 	//		Start server
