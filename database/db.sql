@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Aug 08, 2025 at 11:21 AM
+-- Generation Time: Aug 14, 2025 at 10:57 PM
 -- Server version: 9.4.0
 -- PHP Version: 8.2.27
 
@@ -31,7 +31,7 @@ CREATE TABLE `transaction` (
   `t_id` int NOT NULL,
   `w_id` int NOT NULL,
   `type` varchar(5) NOT NULL,
-  `amount` decimal(10,0) NOT NULL,
+  `amount` decimal(12,2) NOT NULL,
   `from_w_id` int NOT NULL,
   `to_w_id` int NOT NULL,
   `t_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -69,10 +69,18 @@ INSERT INTO `user` (`u_id`, `u_name`, `u_surname`, `u_mail`, `u_password`, `u_cr
 
 CREATE TABLE `wallet` (
   `w_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `w_balance` decimal(10,0) NOT NULL,
+  `u_id` int NOT NULL,
+  `w_balance` decimal(12,2) NOT NULL,
   `w_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `wallet`
+--
+
+INSERT INTO `wallet` (`w_id`, `u_id`, `w_balance`, `w_create_at`) VALUES
+(1, 1, 2132.12, '2025-08-09 00:24:42'),
+(2, 2, 15.00, '2025-08-09 00:24:53');
 
 --
 -- Indexes for dumped tables
@@ -116,7 +124,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `wallet`
 --
 ALTER TABLE `wallet`
-  MODIFY `w_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `w_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
