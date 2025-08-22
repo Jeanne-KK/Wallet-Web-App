@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Aug 14, 2025 at 10:57 PM
+-- Generation Time: Aug 22, 2025 at 12:15 AM
 -- Server version: 9.4.0
 -- PHP Version: 8.2.27
 
@@ -34,7 +34,8 @@ CREATE TABLE `transaction` (
   `amount` decimal(12,2) NOT NULL,
   `from_w_id` int NOT NULL,
   `to_w_id` int NOT NULL,
-  `t_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `t_create_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `t_status` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -79,8 +80,8 @@ CREATE TABLE `wallet` (
 --
 
 INSERT INTO `wallet` (`w_id`, `u_id`, `w_balance`, `w_create_at`) VALUES
-(1, 1, 2132.12, '2025-08-09 00:24:42'),
-(2, 2, 15.00, '2025-08-09 00:24:53');
+(1, 1, 500.00, '2025-08-09 00:24:42'),
+(2, 2, 4900.00, '2025-08-09 00:24:53');
 
 --
 -- Indexes for dumped tables
@@ -112,7 +113,7 @@ ALTER TABLE `wallet`
 -- AUTO_INCREMENT for table `transaction`
 --
 ALTER TABLE `transaction`
-  MODIFY `t_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `t_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `user`
