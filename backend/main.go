@@ -34,6 +34,7 @@ func main(){
 	mux.Handle("/getUserBalance", handler.AuthMiddleware(http.HandlerFunc(handler.GetUserBalance)))
 	mux.Handle("/transfer", handler.AuthMiddleware(http.HandlerFunc(handler.Transaction)))
 	mux.Handle("/logout", handler.AuthMiddleware(http.HandlerFunc(handler.Logout)))
+	mux.Handle("/beforetransfer", handler.AuthMiddleware(http.HandlerFunc(handler.BeforeTransfer)))
 
 	//		Start server
 	http.ListenAndServe(":5000", cors)

@@ -18,31 +18,79 @@ type Transaction struct {
 	T_create_at string `json:"t_create_at"`
 }
 
-func CheckOwnerWallet(tx *sql.Tx, mail string, w_id int) (error) {
-	rows, err := tx.Query("select u_mail, u.u_id, w_id from user u, wallet w where u_mail = ? and u.u_id = w.u_id and w_id = ?",mail, w_id)
+type CheckUser struct {
+	U_name string `json:"u_name"`
+	D_name string `json:"d_name"`
+}
+
+
+
+func CheckDataTransfer(mail string, w_id int, t_type string, to_w_id int, data *CheckUser) (error){
+	if w_id == to_w_id {
+		return fmt.Errorf("same acc")
+	}
+	var err error
+	data.U_name, err = CheckOwnerWallet(nil, mail, w_id)	
 	if err != nil {
 		return err
 	}
+	log.Print("User is owner wallet")
+	//log.Print(data.U_name)
+	
+	data.D_name, err = CheckToWallet(nil, to_w_id)
+	if err != nil {
+		return err
+	}
+	log.Print("have des wallet")	
+	//log.Print(data.D_name)
+	return nil
+}
+
+func CheckOwnerWallet(tx *sql.Tx, mail string, w_id int) (string, error) {	
+	var rows *sql.Rows
+	var err error
+	if tx != nil {
+		rows, err = tx.Query("select u_name, u_surname  from user u, wallet w where u_mail = ? and u.u_id = w.u_id and w_id = ?",mail, w_id)
+	}else{
+		rows, err = db.DB.Query("select u_name, u_surname  from user u, wallet w where u_mail = ? and u.u_id = w.u_id and w_id = ?",mail, w_id)
+	}
+	
+	if err != nil {
+		return "", err
+	}
 	defer rows.Close()
 
+	var name, surname string
 	if rows.Next() {
-		return nil
+		rows.Scan(&name, &surname)
+		new := name + " " + surname	
+		return new, nil
 	}else{
-		return sql.ErrNoRows
+		return "", sql.ErrNoRows
 	}
 }
 
-func CheckToWallet(tx *sql.Tx, t_w_id int)(error){
-	rows, err := tx.Query("select w_id from wallet where w_id = ?", t_w_id)
-	if err != nil {
-		return err
+func CheckToWallet(tx *sql.Tx, t_w_id int)(string, error){
+	var rows *sql.Rows
+	var err error
+	if tx != nil {
+		rows, err = tx.Query("SELECT u_name u, u_surname u FROM wallet w, user u WHERE u.u_id = w.u_id and w.w_id = ?", t_w_id)
+	}else{
+		rows, err = db.DB.Query("SELECT u_name u, u_surname u FROM wallet w, user u WHERE u.u_id = w.u_id and w.w_id = ?", t_w_id)
 	}
 	defer rows.Close()
+	
+	if err != nil {
+		return "", err
+	}
+	var name, surname string
 
 	if rows.Next() {
-		return nil
+		err = rows.Scan(&name, &surname)
+		new := name + " " + surname
+		return new, nil
 	}else{
-		return sql.ErrNoRows
+		return "", sql.ErrNoRows
 	}
 }
 
@@ -113,7 +161,7 @@ func Transfer(mail string, transaction *Transaction) (error){
 	log.Print("make transaction")
 
 	//		check owner wallet with mail
-	err = CheckOwnerWallet(tx, mail, transaction.W_id) 	
+	_, err = CheckOwnerWallet(tx, mail, transaction.W_id) 	
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("not found wallet in this mail")
@@ -127,7 +175,7 @@ func Transfer(mail string, transaction *Transaction) (error){
 	
 
 	//		check have des wallet in db
-	err = CheckToWallet(tx, transaction.To_w_id)
+	_, err = CheckToWallet(tx, transaction.To_w_id)
 	if err != nil {
 		tx.Rollback()
 		return fmt.Errorf("dont have des wallet")

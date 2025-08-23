@@ -11,7 +11,6 @@ const Login = () => {
     const [mail, setMail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [checkErr, setCheckErr] = useState<boolean>(false);
 
     const handleLogin = async() =>{
         //      Protect repeat press

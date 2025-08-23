@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom"
 
-Link
+interface QuickActionsProps {
+    acc: number;
+    amount: string;
+}
 
-const QuickActions = () => {
+const QuickActions = ({acc, amount}: QuickActionsProps) => {
     return (
         <div className="bg-white p-5 rounded-3xl">
             <span className="text-xl font-semibold">Quick Actions</span>
             <div className="grid grid-cols-2 md:grid-cols-4 my-5 md:my-10 gap-y-5">
-                <Link to="/transfer" className="flex flex-col items-center cursor-pointer animate-fadein hover:-translate-y-1 duration-300">
+                <Link to="/transfer" state={{data: acc, balance: amount}} className="flex flex-col items-center cursor-pointer animate-fadein hover:-translate-y-1 duration-300">
                     <div className="bg-gradient-to-br from-rose-400 to-orange-300 rounded text-2xl p-1">💸</div>
                     <span>Transfer</span>
                 </Link>
