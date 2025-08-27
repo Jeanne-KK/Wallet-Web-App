@@ -64,3 +64,12 @@ func CreateUser(newUser InputRegister) (error){
 	_, err := db.DB.Exec("insert into user (u_mail, u_password, u_name, u_surname, u_phone) values (?, ?, ?, ?, ?)", newUser.Mail, newUser.Password, newUser.Name, newUser.Surname, newUser.Phone)
 	return err
 }
+
+func GetPassHash(data string) (string, error) {
+	var passHash string
+	err := db.DB.QueryRow("select u_password from user where u_mail = ?", data).Scan(&passHash)
+	if err != nil {
+		return "", err
+	}
+	return passHash, nil
+}

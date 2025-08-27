@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"myapp/internal/model"
 	"net/http"
-	"myapp/internal/db"
-	//"log"
+	"myapp/internal/db"	
 )
 
 func GetUserInfo(w http.ResponseWriter, r *http.Request) {	

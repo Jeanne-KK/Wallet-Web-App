@@ -7,7 +7,6 @@ import (
 	"log"
 	"github.com/go-playground/validator/v10"
 	"myapp/internal/utils"
-	"myapp/internal/db"	
 	"context"
 	"myapp/internal/service"
 )
@@ -17,11 +16,7 @@ var validate = validator.New()
 func Login(w http.ResponseWriter, r *http.Request){
 	//		Check method
 	if r.Method != http.MethodPost{
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Method not allow",
-		})
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)	
 		return
 	}
 
@@ -29,57 +24,14 @@ func Login(w http.ResponseWriter, r *http.Request){
 	var data model.InputLogin	
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil{
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Invalid JSON format",
-		})
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
 		return
-	}
+	}		
 
-	//		Validate input
-	err = validate.Struct(data)
-	if err != nil{
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Validation fail: " + err.Error(),
-		})
-		return
-	}
-	//log.Printf("recieve mail: %s, password %s", data.Mail, data.Password)
-
-	//		Check user from mail
-	var user model.InputLogin
-	err = db.DB.QueryRow("select u_mail, u_password from user where u_mail = ?", data.Mail).Scan(&user.Mail, &user.Password)
-	if err != nil{
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Invalid email or password",	
-		})	
-		return
-	}
-	//log.Println("have user from mail")
-
-	//		Check password
-	if !utils.CheckPassword(data.Password, user.Password){
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Invalid email or password",	
-		})	
-		return
-	}
-
-	//		Create JWT token
-	token, err := utils.GenerateToken(user.Mail)
-	if err != nil{
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Fail to create token",	
-		})	
+	//		Logic login
+	token, err := service.LoginUser(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	

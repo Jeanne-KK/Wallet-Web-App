@@ -10,7 +10,7 @@ import (
 
 var validate = validator.New()
 
-func ValidateInput(data model.InputRegister)error{
+func ValidateInputRegister(data model.InputRegister)error{
 	err := validate.Struct(data)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func ValidateInput(data model.InputRegister)error{
 
 func RegisterUser(data model.InputRegister) (string, error){
 	//		Validate input
-	err := ValidateInput(data)
+	err := ValidateInputRegister(data)
 	if err != nil {
 		return "", fmt.Errorf("validaion fail : %w", err)
 	}
