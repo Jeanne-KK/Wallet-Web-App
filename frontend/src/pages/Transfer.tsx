@@ -82,7 +82,7 @@ const Transfer = () => {
         if(decimalPart && decimalPart.length > 2){
             setErrAmount("cannot have more than 3 decimal")
             return
-        }
+         }
         if(parseFloat(inputBaht) > parseFloat(balance)){
             setErrAmount("not enough balance")
             return

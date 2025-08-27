@@ -2,6 +2,7 @@ package model
 
 import (
 	"myapp/internal/db"
+	"database/sql"
 )
 
 type InputLogin struct{
@@ -45,4 +46,21 @@ func GetBalance(user *User) (error){
 		return err
 	}
 	return nil
+}
+
+func CheckMailExist(mail string) (bool, error){
+	var hold string
+	err := db.DB.QueryRow("select u_mail from user where u_mail = ?", mail).Scan(&hold)
+	if err == sql.ErrNoRows{
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func CreateUser(newUser InputRegister) (error){
+	_, err := db.DB.Exec("insert into user (u_mail, u_password, u_name, u_surname, u_phone) values (?, ?, ?, ?, ?)", newUser.Mail, newUser.Password, newUser.Name, newUser.Surname, newUser.Phone)
+	return err
 }
