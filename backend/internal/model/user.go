@@ -3,6 +3,7 @@ package model
 import (
 	"myapp/internal/db"
 	"database/sql"
+	"log"
 )
 
 type InputLogin struct{
@@ -61,8 +62,33 @@ func CheckMailExist(mail string) (bool, error){
 }
 
 func CreateUser(newUser InputRegister) (error){
-	_, err := db.DB.Exec("insert into user (u_mail, u_password, u_name, u_surname, u_phone) values (?, ?, ?, ?, ?)", newUser.Mail, newUser.Password, newUser.Name, newUser.Surname, newUser.Phone)
-	return err
+	//		make transaction db
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return err
+	}
+	data, err := tx.Exec("insert into user (u_mail, u_password, u_name, u_surname, u_phone) values (?, ?, ?, ?, ?)", newUser.Mail, newUser.Password, newUser.Name, newUser.Surname, newUser.Phone)
+	if err != nil {
+		log.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	Id, err := data.LastInsertId()
+	if err != nil {
+		log.Print("Not have ID")
+		tx.Rollback()
+		return err
+	}
+	log.Println(Id);
+
+	_, err = tx.Exec("insert into wallet (u_id, w_balance) values (?, ?)", Id, 0)
+	//		Commit transaction db
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetPassHash(data string) (string, error) {
