@@ -28,7 +28,7 @@ func main(){
 
 	//		Setup route	
 	app.Post("/login", handler.Login)
-	//app.Post("/register", handler.Register)
+	app.Post("/register", handler.Register)
 	//app.Post("/getUserInfo", handler.AuthMiddleware, http.HandlerFunc(handler.GetUserInfo))
 	//app.Post("/getUserBalance", handler.authMiddleware, http.HandlerFunc(handler.GetUserBalance))
 	//app.Post("/transfer", handler.authMiddleware, http.HandlerFunc(handler.Transaction))

@@ -12,10 +12,6 @@ import (
 var validate = validator.New()
 
 func Login(c *fiber.Ctx) error {
-	//		Check method
-	if c.Method() != fiber.MethodPost{
-		return c.Status(fiber.StatusMethodNotAllowed).SendString("Method not allowed")
-	}
 
 	//		Check format json
 	var data model.InputLogin	
@@ -40,40 +36,33 @@ func Login(c *fiber.Ctx) error {
 	})	
 }
 
-/*
-func Register(w http.ResponseWriter, r *http.Request){
-	
-	//		Check method
-	if r.Method != http.MethodPost{
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+
+func Register(c *fiber.Ctx) error {	
 
 	//		Check format json
 	var data model.InputRegister	
-	err := json.NewDecoder(r.Body).Decode(&data)
+	err := c.BodyParser(&data)
 	if err != nil{
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid JSON")
 	}
 
 	//		logic Register
 	token, err := service.RegisterUser(data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
 	//		Use httpCookie
-	utils.SetCookie(w, token)
+	utils.SetCookie(c, token)
 
 	//		return token
-	json.NewEncoder(w).Encode(model.Response{
+	return c.JSON(model.Response{
 		Success: true,
-		Message: "Register success",
+		Message: "Register success",	
 	})
 }
 
+/*
 func Logout(w http.ResponseWriter, r *http.Request){
 	//		Check method
 	if r.Method != http.MethodPost{
