@@ -31,9 +31,9 @@ func main(){
 	app.Post("/register", handler.Register)
 	app.Post("/getUserInfo", handler.AuthMiddleware, handler.GetUserInfo)
 	app.Post("/getUserBalance", handler.AuthMiddleware, handler.GetUserBalance)
-	//app.Post("/transfer", handler.authMiddleware, http.HandlerFunc(handler.Transaction))
+	app.Post("/transfer", handler.AuthMiddleware, handler.Transaction)
 	app.Post("/logout", handler.AuthMiddleware, handler.Logout)
-	//app.Post("/beforetransfer", handler.AuthMiddleware, http.HandlerFunc(handler.BeforeTransfer))
+	app.Post("/beforetransfer", handler.AuthMiddleware, handler.BeforeTransfer)
 
 	//		Start server
 	app.Listen(":5000")

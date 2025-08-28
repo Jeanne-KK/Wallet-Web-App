@@ -73,3 +73,11 @@ func GetPassHash(data string) (string, error) {
 	}
 	return passHash, nil
 }
+
+func GetInfo(user *User, mail string) (error){
+	err := db.DB.QueryRow("select u_name, u_surname, u_mail, u_phone from user where u_mail = ?", mail).Scan(&user.Name, &user.Surname, &user.Mail, &user.Phone)
+	if err != nil {
+		return err
+	}
+	return nil
+}
