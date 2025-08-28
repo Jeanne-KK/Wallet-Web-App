@@ -32,7 +32,7 @@ func main(){
 	//app.Post("/getUserInfo", handler.AuthMiddleware, http.HandlerFunc(handler.GetUserInfo))
 	//app.Post("/getUserBalance", handler.authMiddleware, http.HandlerFunc(handler.GetUserBalance))
 	//app.Post("/transfer", handler.authMiddleware, http.HandlerFunc(handler.Transaction))
-	//app.Post("/logout", handler.authMiddleware, http.HandlerFunc(handler.Logout))
+	app.Post("/logout", handler.AuthMiddleware, handler.Logout)
 	//app.Post("/beforetransfer", handler.AuthMiddleware, http.HandlerFunc(handler.BeforeTransfer))
 
 	//		Start server

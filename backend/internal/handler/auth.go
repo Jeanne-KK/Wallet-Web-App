@@ -62,39 +62,23 @@ func Register(c *fiber.Ctx) error {
 	})
 }
 
-/*
-func Logout(w http.ResponseWriter, r *http.Request){
-	//		Check method
-	if r.Method != http.MethodPost{
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Method not allow",
-		})
-		return
-	}
 
+func Logout(c *fiber.Ctx) error {
 	//		Get mail from context middleware
-	mail := r.Context().Value("mail")
+	mail := c.Context().Value("mail")
 	if mail == nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(model.Response{
-			Success: false,
-			Message: "Dont have token",
-		})
-		return
+		return c.Status(fiber.StatusUnauthorized).SendString("Dont have token")
 	}
 
 	//		Clear cookie
-	utils.ClearCookie(w)
+	utils.ClearCookie(c)
 
 	//		Response
-	json.NewEncoder(w).Encode(model.Response{
+	return c.JSON(model.Response{
 		Success: true,
 		Message: "Logout success",
 	})
 }
-*/
 
 func AuthMiddleware(c *fiber.Ctx) error{
 	log.Println("FROM middleware")
