@@ -1,15 +1,16 @@
 package main
 
 import (
-	"net/http"
 	"myapp/internal/handler"
 	"myapp/internal/db"
 	"log"
-	"github.com/rs/cors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main(){
-	mux := http.NewServeMux()
+	app := fiber.New()
+	
 	//		Connect DB
 	err := db.Init()
 	if err != nil{
@@ -18,24 +19,22 @@ func main(){
 	defer db.DB.Close()
 
 	//		Setting CORS
-	cors := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:5173"},
-		AllowedMethods:   []string{"GET", "POST"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173",
+		AllowHeaders: "Origin, Content-Type, Authorization",
+		AllowMethods: "GET, POST",
 		AllowCredentials: true,
-	}).Handler(mux)
+	}))	
 
-
-	//		Setup route
-	mux.HandleFunc("/", handler.GetHello)
-	mux.HandleFunc("/login", handler.Login)
-	mux.HandleFunc("/register", handler.Register)
-	mux.Handle("/getUserInfo", handler.AuthMiddleware(http.HandlerFunc(handler.GetUserInfo)))
-	mux.Handle("/getUserBalance", handler.AuthMiddleware(http.HandlerFunc(handler.GetUserBalance)))
-	mux.Handle("/transfer", handler.AuthMiddleware(http.HandlerFunc(handler.Transaction)))
-	mux.Handle("/logout", handler.AuthMiddleware(http.HandlerFunc(handler.Logout)))
-	mux.Handle("/beforetransfer", handler.AuthMiddleware(http.HandlerFunc(handler.BeforeTransfer)))
+	//		Setup route	
+	app.Post("/login", handler.Login)
+	//app.Post("/register", handler.Register)
+	//app.Post("/getUserInfo", handler.AuthMiddleware, http.HandlerFunc(handler.GetUserInfo))
+	//app.Post("/getUserBalance", handler.authMiddleware, http.HandlerFunc(handler.GetUserBalance))
+	//app.Post("/transfer", handler.authMiddleware, http.HandlerFunc(handler.Transaction))
+	//app.Post("/logout", handler.authMiddleware, http.HandlerFunc(handler.Logout))
+	//app.Post("/beforetransfer", handler.AuthMiddleware, http.HandlerFunc(handler.BeforeTransfer))
 
 	//		Start server
-	http.ListenAndServe(":5000", cors)
+	app.Listen(":5000")
 }

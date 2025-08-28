@@ -1,39 +1,39 @@
 package utils
 
 import (
-	"net/http"
     "time"
+	"github.com/gofiber/fiber/v2"
+    "errors"
 )
+
 //		function set cookie
-func SetCookie(w http.ResponseWriter, token string){
-	cookie := &http.Cookie{
+func SetCookie(c *fiber.Ctx, token string){
+	c.Cookie(&fiber.Cookie{
         Name:     "jwt",
         Value:    token,
         Path:     "/",
         MaxAge:   60 * 20,
-        HttpOnly: true,
-        SameSite: http.SameSiteLaxMode, 
-    }
-    http.SetCookie(w, cookie)
+        HTTPOnly: true,
+        SameSite: "Lax", 
+    })
 }
 
-func GetCookie(r *http.Request, name string) (string, error){
-	cookie, err := r.Cookie(name)
-	if err != nil {
-		return "", err
+func GetCookie(c *fiber.Ctx, name string) (string, error){
+	cookie := c.Cookies(name)
+	if cookie == "" {
+		return "", errors.New("cookie not found")
 	}
-	return cookie.Value, nil
+	return cookie, nil
 }
 
-func ClearCookie(w http.ResponseWriter){
-    cookie := &http.Cookie{
+func ClearCookie(c *fiber.Ctx){
+    c.Cookie(&fiber.Cookie{
         Name:     "jwt",
         Value:    "",
         Path:     "/",
         Expires: time.Now().Add(-24 * time.Hour),
         MaxAge:   -1,
-        HttpOnly: true,
-        SameSite: http.SameSiteLaxMode, 
-    }
-    http.SetCookie(w, cookie)
+        HTTPOnly: true,
+        SameSite: "Lax", 
+    }) 
 }

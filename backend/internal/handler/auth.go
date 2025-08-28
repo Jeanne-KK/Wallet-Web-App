@@ -1,51 +1,46 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
 	"myapp/internal/model"
 	"log"
 	"github.com/go-playground/validator/v10"
 	"myapp/internal/utils"
-	"context"
 	"myapp/internal/service"
+	"github.com/gofiber/fiber/v2"
 )
 
 var validate = validator.New()
 
-func Login(w http.ResponseWriter, r *http.Request){
+func Login(c *fiber.Ctx) error {
 	//		Check method
-	if r.Method != http.MethodPost{
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)	
-		return
+	if c.Method() != fiber.MethodPost{
+		return c.Status(fiber.StatusMethodNotAllowed).SendString("Method not allowed")
 	}
 
 	//		Check format json
 	var data model.InputLogin	
-	err := json.NewDecoder(r.Body).Decode(&data)
+	err := c.BodyParser(&data)
 	if err != nil{
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid JSON")
 	}		
 
 	//		Logic login
 	token, err := service.LoginUser(data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	
 	//		Set cookie
-	utils.SetCookie(w, token)
+	utils.SetCookie(c, token)
 
 	//		return token
-	json.NewEncoder(w).Encode(model.Response{
+	return c.JSON(model.Response{
 		Success: true,
-		Message: "Login success",	
-	})
-	
+		Message: "Login success",
+	})	
 }
 
+/*
 func Register(w http.ResponseWriter, r *http.Request){
 	
 	//		Check method
@@ -110,25 +105,20 @@ func Logout(w http.ResponseWriter, r *http.Request){
 		Message: "Logout success",
 	})
 }
+*/
 
-func AuthMiddleware(next http.Handler) http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-		log.Println("FROM middleware")
+func AuthMiddleware(c *fiber.Ctx) error{
+	log.Println("FROM middleware")
 
-		//		Get cookie
-		cookie, err := utils.GetCookie(r, "jwt")
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(model.Response{
-				Success: false,
-				Message: "Cookie not found",
-			})
-		return
-		}
+	//		Get cookie
+	cookie, err := utils.GetCookie(c, "jwt")
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"success": false, "message": "Cookie not found"})
+	}	
+	data, err := utils.ValidateToken(cookie)
+	//log.Println(data.Mail)
+	c.Locals("mail", data.Mail)
 	
-		data, err := utils.ValidateToken(cookie)
-		//log.Println(data.Mail)
-		ctx := context.WithValue(r.Context(), "mail", data.Mail)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+	return c.Next()
 }
+
